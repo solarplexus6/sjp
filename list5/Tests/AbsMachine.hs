@@ -8,4 +8,7 @@ import Imp.AbsMachine
 import Tests.Programs
 
 testWhile :: Assertion
-testWhile = run (whileAbsProg) @?= whileAbsProgFinalStore
+testWhile = run (whileAbsProg) @?= whileProgFinalStore
+
+testFactorial :: Assertion
+testFactorial = run (factorialAbsProg) @?= factorialProgFinalStore

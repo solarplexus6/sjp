@@ -53,7 +53,8 @@ tests = [
       ],
     testGroup "Abstract machine tests" [
         testGroup "Commands" [
-            testCase "While" AbsMachine.testWhile
+            testCase "While" AbsMachine.testWhile,
+            testCase "Factorial" AbsMachine.testFactorial
           ]
       ]
   ]
