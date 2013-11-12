@@ -1,0 +1,56 @@
+elementy teorii dziedzin
+
+Def (porz. częściowy)
+
+(P, \[)
+
+(1) p \[ p zwrotność
+(2) przechodniość
+(3) słaba antysymetrycznosc
+
+
+Def. p jest najmniejszym ogr. gornym X \c P
+
+(1) p jest ogr. gornym X
+(2) jesli q jest ograniczeniem gornym X, to p \[ q
+
+P = |_| X
+
+
+Def omega-lancuch w (P, \[)
+d0 \[ d1 \[ d2 \[ d3 \[ ...
+
+Def. Porzadek czesciowy (P, \[) nazywamy zupelnym (complete partial order, CPO)
+jesli dla kazdego omega-lancucha w (P, \[) istnieje jego najmniejsze ograniczenie |_| d_i.
+
+Def. Zupelny porz. cz. nazywamy dziedzina jezeli zawiera element najmniejszy _|_ (_|_ \[ d . V d)
+
+Def. funkcja monotoniczna
+
+(D, \[_D), (E, \[_E) - porzadki czesciowe
+f: D -> E
+V d, d' w D, d \[_D d' => f(d) \[_E f(d')
+
+Def. fun. ciagla
+
+(1) f jest monotoniczna
+(2) dla wszystkich omega lancuchow w D:
+		F(|_| d_n) = |_| f(d_n) (n nalezy do Nat)
+
+Tw. (o punkcie stalym)
+Niech f: D -> D bedzie f-cja ciagla na dziedzinie D.
+Niech fix = |_| f^n(_|_)
+
+Wówczas
+(1) f (fix f) = fix f
+(2) jesli f(d) \[ d, to fix f \[ d
+
+D-d
+(1) f(fix f) = (def.) f (|_| f^n(_|_)) = (cg.) |_| f^(n+1)(_|_) = |_| f^(n+1)(_|_) i_i _|_ = |_| f^n(_|_) = (def) fix f
+
+(2) |_| \[ d => V n Nat . f^n(_|_) \[ d => fix f \[ d
+
+C [| while b do c|] = fix F
+F g sigma = { (g o C[|c|]) sigma, B[|b|] sigma = true,
+ 			  sigma, wpp}
+
