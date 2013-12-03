@@ -4,10 +4,10 @@ import CommonAbsSyntax
 import ExTwo.AbsSyntax
 import ExTwo.Common (Omega (..))
 
-withoutLoopProg = "x" := N 12 :.: 
-                  If (V "x" :<=: N 20) 
-                     ("x" := V "x" :+: N 11 :.: 
-                      "y" := V "x" :*: N 2) 
+withoutLoopProg = "x" := N 12 :.:
+                  If (V "x" :<=: N 20)
+                     ("x" := V "x" :+: N 11 :.:
+                      "y" := V "x" :*: N 2)
                      Skip
 
 withoutLoopProgResult :: Omega
