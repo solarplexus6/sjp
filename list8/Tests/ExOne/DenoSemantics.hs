@@ -1,12 +1,15 @@
-module Tests.ExOne where
+module Tests.ExOne.DenoSemantics where
 
 import Test.HUnit
 import Test.QuickCheck
 
+import Common
+import CommonAbsSyntax
 import ExOne.AbsSyntax
+import ExOne.Common
 import ExOne.DenoSemantics
 
-import Tests.Programs
+import Tests.ExOne.Programs
 
 testVar :: Assertion
 testVar = aexp (V "x", [("x", 5)]) @?= 5
@@ -35,17 +38,23 @@ testComplexBexp = bexp (V "x" :+: V "y" :*: N 3 :<=: N 18 :&&: V "x" :=: N 5, [(
 
 --
 
+testComm :: Com -> [Int] -> OmegaResult -> Assertion
+testComm c input result = evalOmega (comm c []) input @?= result
+
 testLoopless :: Assertion
-testLoopless = comm withoutLoopProg [] @?= TauTerm withoutLoopProgFinalStore
+testLoopless = testComm withoutLoopProg [] withoutLoopProgResult
 
 testWhile :: Assertion
-testWhile = comm whileProg [] @?= TauTerm whileProgFinalStore
+testWhile = testComm whileProg [] whileProgResult
 
 testFactorial :: Assertion
-testFactorial = comm factorialProg [] @?= TauTerm factorialProgFinalStore
+testFactorial = testComm factorialProg [] factorialProgResult
 
 testAbort :: Assertion
-testAbort = comm abortProg [] @?= TauAbort abortProgFinalStore
+testAbort = testComm abortProg [] abortProgResult
 
 testOutput :: Assertion
-testOutput = comm outputProg [] @?= outputProgFinalOmega
+testOutput = testComm outputProg [] outputProgResult
+
+testInput :: Assertion
+testInput = testComm inputProg inputProgInput inputProgResult
