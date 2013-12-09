@@ -119,7 +119,7 @@
 			"file": "Common.hs",
 			"settings":
 			{
-				"buffer_size": 317,
+				"buffer_size": 981,
 				"line_ending": "Windows"
 			}
 		},
@@ -127,7 +127,7 @@
 			"file": "Tests/Main.hs",
 			"settings":
 			{
-				"buffer_size": 1758,
+				"buffer_size": 4432,
 				"line_ending": "Windows"
 			}
 		},
@@ -135,18 +135,7 @@
 			"file": "ExOne/AbsSyntax.hs",
 			"settings":
 			{
-				"buffer_size": 1054,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "module Tests.Programs where\n\nimport ExOne.AbsSyntax\n\nwithoutLoopProg = \"x\" := N 12 :.: \n                  If (V \"x\" :<=: N 20) \n                     (\"x\" := V \"x\" :+: N 11 :.: \n                      \"y\" := V \"x\" :*: N 2) \n                     Skip\n\nwithoutLoopProgFinalStore :: [(String, Int)]\nwithoutLoopProgFinalStore = [(\"x\", 23), (\"y\", 46)]\n\n--\n\nwhileProg = \"a\" := N 20 :.: While (V \"a\" :<=: N 100) (\"a\" := V \"a\" :*: N 2)\n\nwhileProgFinalStore :: [(String, Int)]\nwhileProgFinalStore = [(\"a\", 160)]\n\n--\n\nfactorialProg = \"a\" := N 10 :.: \"fac\" := N 1 :.: While (Not $ V \"a\" :<=: N 0) (\"fac\" := V \"fac\" :*: V \"a\" :.: \"a\" := V \"a\" :-: N 1)\n\nfactorialProgFinalStore :: [(String, Int)]\nfactorialProgFinalStore = [(\"a\", 0), (\"fac\", 3628800 :: Int)]\n\nabortProg = \"x\" := N 1 :.:\n            While (B True)\n                (If (V \"x\" :<=: N 10)\n                    (\"x\" := V \"x\" :+: N 1)\n                    (Fail)\n                )\n\nabortProgFinalStore :: [(String, Int)]\nabortProgFinalStore = [(\"x\", 11)]",
-			"file": "Tests/Programs.hs",
-			"file_size": 1053,
-			"file_write_time": 130305079148744865,
-			"settings":
-			{
-				"buffer_size": 998,
+				"buffer_size": 497,
 				"line_ending": "Windows"
 			}
 		},
@@ -154,7 +143,7 @@
 			"file": "ExOne/DenoSemantics.hs",
 			"settings":
 			{
-				"buffer_size": 1661,
+				"buffer_size": 1062,
 				"line_ending": "Windows"
 			}
 		},
@@ -162,7 +151,7 @@
 			"file": "Tests/ExOne.hs",
 			"settings":
 			{
-				"buffer_size": 1383,
+				"buffer_size": 0,
 				"line_ending": "Windows"
 			}
 		},
@@ -283,6 +272,7 @@
 	},
 	"file_history":
 	[
+		"/D/Projects/sjp/list8/Tests/Programs.hs",
 		"/D/Projects/sjp/list8/ImpDenotationalSemantics.cabal",
 		"/D/Projects/sjp/list8/Tests/ExOne.hs",
 		"/D/Projects/sjp/list8/ExOne/DenoSemantics.hs",
@@ -409,8 +399,7 @@
 		"/C/Users/solarplexus/Projects/Elm/Examples/elm-yesod/Main.hs",
 		"/C/Users/solarplexus/Projects/ETO/reports/rl_29-10-2012_raport.txt",
 		"/C/Users/solarplexus/Projects/hello-elm/main.elm",
-		"/C/sudo/Sublime Text 2/Data/Packages/Haskell/Haskell.tmLanguage",
-		"/C/Users/solarplexus/Projects/elm-lang.org/server/ElmToHtml.hs"
+		"/C/sudo/Sublime Text 2/Data/Packages/Haskell/Haskell.tmLanguage"
 	],
 	"find":
 	{
@@ -524,7 +513,6 @@
 	"groups":
 	[
 		{
-			"selected": 3,
 			"sheets":
 			[
 				{
@@ -532,15 +520,15 @@
 					"file": "Common.hs",
 					"settings":
 					{
-						"buffer_size": 317,
+						"buffer_size": 981,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								285,
-								285
+								0,
+								0
 							]
 						],
 						"settings":
@@ -558,15 +546,15 @@
 					"file": "Tests/Main.hs",
 					"settings":
 					{
-						"buffer_size": 1758,
+						"buffer_size": 4432,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1617,
-								1617
+								0,
+								0
 							]
 						],
 						"settings":
@@ -586,15 +574,15 @@
 					"file": "ExOne/AbsSyntax.hs",
 					"settings":
 					{
-						"buffer_size": 1054,
+						"buffer_size": 497,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								732,
-								743
+								0,
+								0
 							]
 						],
 						"settings":
@@ -611,23 +599,25 @@
 				},
 				{
 					"buffer": 3,
-					"file": "Tests/Programs.hs",
+					"file": "ExOne/DenoSemantics.hs",
 					"settings":
 					{
-						"buffer_size": 998,
+						"buffer_size": 1062,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								798,
-								798
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/SublimeHaskell/Syntaxes/Haskell-SublimeHaskell.tmLanguage"
+							"syntax": "Packages/SublimeHaskell/Syntaxes/Haskell-SublimeHaskell.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -637,44 +627,18 @@
 				},
 				{
 					"buffer": 4,
-					"file": "ExOne/DenoSemantics.hs",
-					"settings":
-					{
-						"buffer_size": 1661,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1535,
-								1535
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/SublimeHaskell/Syntaxes/Haskell-SublimeHaskell.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 45.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
 					"file": "Tests/ExOne.hs",
 					"settings":
 					{
-						"buffer_size": 1383,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1321,
-								1330
+								0,
+								0
 							]
 						],
 						"settings":
@@ -694,7 +658,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"settings":
 					{
 						"buffer_size": 2151,
@@ -746,7 +710,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 6,
 					"settings":
 					{
 						"buffer_size": 1204,
