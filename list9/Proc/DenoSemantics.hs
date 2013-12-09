@@ -1,3 +1,5 @@
+{-# LANGUAGE ExistentialQuantification #-}
+
 module Proc.DenoSemantics
 ( comm
 , bexp
@@ -6,41 +8,59 @@ module Proc.DenoSemantics
 )
 where
 
+import Control.Monad.State
 import Proc.Common
 import Proc.AbsSyntax
-import Data.Function (fix)
 
-data Omega = TauTerm Epsilon
+data Omega = IotaTerm Sigma
            deriving (Eq, Show)
 
-asterisk :: (Epsilon -> Omega) -> (Omega -> Omega)
-asterisk f = \omega -> case omega of
-                (TauTerm s)          -> f s                
+--liftBin :: (Monad m) => (t -> m t) -> (t -> t -> b) -> t -> t -> m b
 
-aexp :: (Aexp, Epsilon) -> Numeral
-aexp (N n, _) = n
-aexp (V v, s) = case lookup v s of
-                       Nothing -> error ("unbound variable `" ++ v ++ "'")
-                       Just n  -> n
+liftBin :: Monad m => (t -> m t1) -> (t1 -> t1 -> b) -> t -> t -> m b
+liftBin semFun f expr1 expr2 = do
+    r1 <- semFun expr1
+    r2 <- semFun expr2
+    return $ r1 `f` r2
 
-aexp (a1 :+: a2, s) = aexp (a1, s) + aexp (a2, s)
-aexp (a1 :-: a2, s) = aexp (a1, s) - aexp (a2, s)
-aexp (a1 :*: a2, s) = aexp (a1, s) * aexp (a2, s)
+computeA :: forall b. Aexp -> (Numeral -> Numeral -> b) -> Aexp -> State Sigma b
+computeA a1 op a2 = liftBin aexp op a1 a2
 
-bexp :: (Bexp, Epsilon) -> Bool
-bexp (B b, _)           = b
-bexp (a1 :=: a2, s)       = aexp (a1, s) == aexp (a2, s)
-bexp (a1 :<=: a2, s)   = aexp (a1, s) <= aexp (a2, s)
-bexp (Not b, s)          = not $ bexp (b, s)
-bexp (b1 :&&: b2, s)   = bexp (b1, s) && bexp (b2, s)
-bexp (b1 :||: b2, s)    = bexp (b1, s) || bexp (b2, s)
+computeB :: Bexp -> (Bool -> Bool -> Bool) -> Bexp -> State Sigma Bool
+computeB b1 op b2 = liftBin bexp op b1 b2
 
-comm :: Com -> Epsilon -> Omega
-comm c s = case c of
-    v := a     -> TauTerm $ assign v (aexp (a, s)) s
-    Skip       -> TauTerm s
-    c1 :.: c2  -> (asterisk $ comm c2) . (comm c1) $ s
-    If b c1 c2 -> if bexp (b, s) then comm c1 s else comm c2 s
-    While b c' -> fix gamma s where
-                      gamma f = \s' -> if bexp (b, s') then (asterisk f) . (comm c') $ s' else TauTerm s'    
+aexp :: Aexp -> (State Sigma Numeral)
+aexp expr = case expr of
+    (N n)       -> return n
+    (V v)       -> do
+        get >>= \s -> return $ lookUp v s
+    (a1 :+: a2) -> computeA a1 (+) a2
+    (a1 :-: a2) -> computeA a1 (-) a2
+    (a1 :*: a2) -> computeA a1 (*) a2
+
+bexp :: Bexp -> (State Sigma Bool)
+bexp expr = case expr of
+    B b        -> return b
+    a1 :=: a2  -> computeA a1 (==) a2
+    a1 :<=: a2 -> computeA a1 (<=) a2
+    Not b      -> bexp b >>= (return . not)
+    b1 :&&: b2 -> computeB b1 (&&) b2
+    b1 :||: b2 -> computeB b1 (||) b2
+
+comm :: Com -> (State Sigma Omega)
+comm c = case c of
+    v := a     -> 
+        let declare = do 
+            s  <- get
+            ar <- aexp a
+            return $ assign v ar s
+        in do
+            newS <- declare
+            put $ newS
+            return $ IotaTerm newS
+    Skip       -> get >>= (return . IotaTerm)
+    c1 :.: c2  -> comm c1 >> comm c2        
+    If b c1 c2 -> bexp b >>= \br -> if br then comm c1 else comm c2    
+    While b c' -> fix gamma where
+                      gamma f = bexp b >>= \br -> if br then (comm c') >> f else comm Skip
     _          -> undefined
