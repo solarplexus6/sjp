@@ -2,7 +2,7 @@ module Main
 where
 
 import Data.Monoid (mempty)
-import Test.Framework (defaultMain, defaultMainWithOpts, testGroup)
+import Test.Framework (defaultMain, defaultMainWithOpts, testGroup, Test)
 import Test.Framework.Options (TestOptions, TestOptions'(..))
 import Test.Framework.Runners.Options (RunnerOptions, RunnerOptions'(..))
 import Test.Framework.Providers.HUnit
@@ -10,8 +10,10 @@ import Test.Framework.Providers.QuickCheck2 (testProperty)
 
 import Tests.DenoSemantics
 
+main :: IO ()
 main = defaultMain tests
 
+mainWithOpts :: IO ()
 mainWithOpts = do
     -- Test options can also be specified in the code. The TestOptions
     -- type is an instance of the Monoid type class, so the easiest way
@@ -32,6 +34,7 @@ mainWithOpts = do
 
     defaultMainWithOpts tests my_runner_opts
 
+tests  :: [Test]
 tests = [
     testGroup "Denotational semantics tests" [
             testGroup "Arithmetic expressions" [

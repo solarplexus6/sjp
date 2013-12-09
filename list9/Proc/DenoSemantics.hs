@@ -1,4 +1,4 @@
-module Block.DenoSemantics
+module Proc.DenoSemantics
 ( comm
 , bexp
 , aexp
@@ -6,8 +6,8 @@ module Block.DenoSemantics
 )
 where
 
-import Common
-import Block.AbsSyntax
+import Proc.Common
+import Proc.AbsSyntax
 import Data.Function (fix)
 
 data Omega = TauTerm Epsilon
@@ -29,17 +29,18 @@ aexp (a1 :*: a2, s) = aexp (a1, s) * aexp (a2, s)
 
 bexp :: (Bexp, Epsilon) -> Bool
 bexp (B b, _)           = b
-bexp (a1 :=: a2, s)     = aexp (a1, s) == aexp (a2, s)
-bexp (a1 :<=: a2, s)    = aexp (a1, s) <= aexp (a2, s)
-bexp (Not b, s)         = not $ bexp (b, s)
-bexp (b1 :&&: b2, s)    = bexp (b1, s) && bexp (b2, s)
+bexp (a1 :=: a2, s)       = aexp (a1, s) == aexp (a2, s)
+bexp (a1 :<=: a2, s)   = aexp (a1, s) <= aexp (a2, s)
+bexp (Not b, s)          = not $ bexp (b, s)
+bexp (b1 :&&: b2, s)   = bexp (b1, s) && bexp (b2, s)
 bexp (b1 :||: b2, s)    = bexp (b1, s) || bexp (b2, s)
 
 comm :: Com -> Epsilon -> Omega
 comm c s = case c of
-    v := a      -> TauTerm $ assign v (aexp (a, s)) s
-    Skip        -> TauTerm s
-    c1 :.: c2   -> (asterisk $ comm c2) . (comm c1) $ s
-    If b c1 c2  -> if bexp (b, s) then comm c1 s else comm c2 s
-    While b c'  -> fix gamma s where
-                       gamma f = \s' -> if bexp (b, s') then (asterisk f) . (comm c') $ s' else TauTerm s'    
+    v := a     -> TauTerm $ assign v (aexp (a, s)) s
+    Skip       -> TauTerm s
+    c1 :.: c2  -> (asterisk $ comm c2) . (comm c1) $ s
+    If b c1 c2 -> if bexp (b, s) then comm c1 s else comm c2 s
+    While b c' -> fix gamma s where
+                      gamma f = \s' -> if bexp (b, s') then (asterisk f) . (comm c') $ s' else TauTerm s'    
+    _          -> undefined

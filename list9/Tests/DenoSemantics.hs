@@ -3,8 +3,8 @@ module Tests.DenoSemantics where
 import Test.HUnit
 import Test.QuickCheck
 
-import Block.AbsSyntax
-import Block.DenoSemantics
+import Proc.AbsSyntax
+import Proc.DenoSemantics
 import Tests.Programs
 
 testVar :: Assertion

@@ -1,8 +1,8 @@
-module Common
+module Proc.Common
 ( Epsilon
 , assign) where
 
-import Block.AbsSyntax
+import Proc.AbsSyntax
 
 type Epsilon = [(Var, Numeral)]
 

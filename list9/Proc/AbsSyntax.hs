@@ -1,4 +1,4 @@
-module Block.AbsSyntax where
+module Proc.AbsSyntax where
 
 type Numeral = Int
 type Var = String
