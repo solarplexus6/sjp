@@ -1,19 +1,28 @@
+{-# LANGUAGE ExistentialQuantification #-}
+
 module Tests.DenoSemantics where
 
 import Test.HUnit hiding (State)
 import Test.QuickCheck
 
-import Control.Monad.State (State, runState)
+import qualified Data.Map as M (empty, fromList, findMax)
+import Control.Monad.State (runState)
 
+import Proc.Common (zipDomain, MemAssoc)
 import Proc.AbsSyntax
 import Proc.DenoSemantics
 import Tests.Programs
 
-runTest :: (t -> State b a) -> t -> b -> a
-runTest semFun expr initState = fst $ runState (semFun expr) initState
+runTest semFun expr (envV, sto) = 
+    let initS = case sto of
+                    [] -> (M.empty, (M.empty, 0))
+                    _  -> let stoMap = M.fromList sto in 
+                        (M.fromList envV, (stoMap, (fst $ M.findMax stoMap) + 1))
+    in
+        runState (semFun expr) initS
 
 testVar :: Assertion
-testVar = runTest aexp (V "x") [("x", 5)] @?= 5
+testVar = fst (runTest aexp (V "x") ([("x", 0)], [(0, 5)])) @?= 5
 
 instance Arbitrary Aexp where
     arbitrary = do
@@ -25,26 +34,41 @@ instance Arbitrary Aexp where
 
 testSimpleAexp :: Aexp -> Bool
 testSimpleAexp expr = testResult == expected where
-    testResult = runTest aexp expr []
+    testResult = fst $ runTest aexp expr ([], [])
     expected = 
         case expr of
             (N n :+: N m) -> n + m
             (N n :-: N m) -> n - m
             (N n :*: N m) -> n * m
-            otherwise     -> error "Bad expression type"
+            _             -> error "Bad expression type"
 
 testComplexAexp :: Assertion
-testComplexAexp = runTest aexp (V "x" :+: V "y" :*: N 3) [("x", 5), ("y", 4)] @?= 17
+testComplexAexp = fst (runTest aexp (V "x" :+: V "y" :*: N 3) ([("x", 0), ("y", 1)], [(0, 5), (1, 4)])) @?= 17
 
 --
 
 testComplexBexp :: Assertion
-testComplexBexp = runTest bexp (V "x" :+: V "y" :*: N 3 :<=: N 18 :&&: V "x" :=: N 5) [("x", 5), ("y", 4)] @?= True
+testComplexBexp = fst (runTest bexp (V "x" :+: V "y" :*: N 3 :<=: N 18 :&&: V "x" :=: N 5) ([("x", 0), ("y", 1)], [(0, 5), (1, 4)])) @?= True
 
 --
 
-testComm :: Com -> Omega -> Assertion
-testComm c expectedRes = runTest comm c [] @?= expectedRes
+testDecl :: Dec -> MemAssoc -> Assertion
+testDecl d expectedRes = 
+    let testResult = snd $ runTest decl d ([], []) in
+        zipDomain testResult @?= M.fromList expectedRes
+
+testSimpleVarDecl :: Assertion
+testSimpleVarDecl = testDecl (Var "x" (N 10 :+: N 11)) [("x", 21)]
+
+testMultipleVarDecl :: Assertion
+testMultipleVarDecl = testDecl (Var "x" (N 10) :~: Var "y" (V "x" :*: N 3)) [("x", 10), ("y", 30)]
+
+--
+
+testComm :: Com -> MemAssoc -> Assertion
+testComm c expectedRes = 
+    let (IotaTerm testResult) = fst $ runTest comm c ([], []) in
+        zipDomain testResult @?= M.fromList expectedRes
 
 testLoopless :: Assertion
 testLoopless = testComm withoutLoopProg withoutLoopProgResult
@@ -54,3 +78,10 @@ testWhile = testComm whileProg whileProgResult
 
 testFactorial :: Assertion
 testFactorial = testComm factorialProg factorialProgResult
+
+testDeclOverwrite :: Assertion
+testDeclOverwrite = testComm ("x" := N 5 :.: Begin (Var "x" (N 23) :~: Var "y" (V "x" :*: N 4)) ("z" := V "x" :+: V "y")) [("x", 5), ("y", 92), ("z", 115)]
+
+-- Nielsons Exercise 6.4
+testDeclRestore :: Assertion
+testDeclRestore = testComm declRestoreProgram declRestoreProgramResult
