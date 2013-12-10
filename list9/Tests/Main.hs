@@ -49,6 +49,12 @@ tests = [
                   testCase "Loopless" Tests.DenoSemantics.testLoopless
                 , testCase "While" Tests.DenoSemantics.testWhile
                 , testCase "Factorial" Tests.DenoSemantics.testFactorial                
+              ],
+            testGroup "Declarations" [
+                  testCase "Simple variable declaration" Tests.DenoSemantics.testSimpleVarDecl,
+                  testCase "Multiple variables declaration" Tests.DenoSemantics.testMultipleVarDecl,
+                  testCase "Overwrite global var with local" Tests.DenoSemantics.testDeclOverwrite,
+                  testCase "Restoring var value after exiting block" Tests.DenoSemantics.testDeclRestore
               ]
           ]
     ]
