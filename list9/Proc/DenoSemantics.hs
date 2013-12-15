@@ -56,16 +56,18 @@ comm c = case c of
                     put $ newS
                     return $ IotaTerm newS
     Skip       -> get >>= (return . IotaTerm)
-    c1 :.: c2  -> comm c1 >> comm c2        
+    c1 :.: c2  -> do
+                    (envV, _) <- get -- wyciagamy pierwotne srodowisko
+                    comm c1          -- wywolujemy c1
+                    (_, newS) <- get -- olewamy zmienione srodowisko, wyciagamy nowy store
+                    put (envV, newS) -- przywracamy stare srodowisko
+                    comm c2          -- wywolujemy c2
+                    
     If b c1 c2 -> bexp b >>= \br -> if br then comm c1 else comm c2    
     While b c' -> fix gamma where
                       gamma f = bexp b >>= \br -> if br then (comm c') >> f else comm Skip
     --Begin d c' -> decl d >> comm c' >> get >>= (return . IotaTerm)
-    Begin d c' -> do
-                    (oldEnvV, _) <- get
-                    IotaTerm (newEnvV, newStore) <- decl d >> comm c'
-                    put (restore oldEnvV newEnvV, newStore)
-                    get >>= (return . IotaTerm)
+    Begin d c' -> decl d >> comm c'
     _          -> undefined
 
 decl :: Dec -> (Sigma ())
@@ -73,6 +75,6 @@ decl d = case d of
     Var v a -> do
         n <- aexp a
         s <- get
-        put (assign v n s)
+        put (newVar v n s)
     d1 :~: d2 -> decl d1 >> decl d2        
     _ -> undefined

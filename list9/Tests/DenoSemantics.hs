@@ -80,7 +80,13 @@ testFactorial :: Assertion
 testFactorial = testComm factorialProg factorialProgResult
 
 testDeclOverwrite :: Assertion
-testDeclOverwrite = testComm ("x" := N 5 :.: Begin (Var "x" (N 23) :~: Var "y" (V "x" :*: N 4)) ("z" := V "x" :+: V "y")) [("x", 5), ("y", 92), ("z", 115)]
+testDeclOverwrite = testComm (Begin (Var "x" (N 5) :~: Var "y" (N 0) :~: Var "z" (N 0))
+                                (Begin (Var "x" (N 23) :~: Var "y" (V "x" :*: N 4))
+                                    ("z" := V "x" :+: V "y") :.:
+                                 "y" := V "x"
+                                )
+                             )
+                            [("x", 5), ("y", 5), ("z", 115)]
 
 -- Nielsons Exercise 6.4
 testDeclRestore :: Assertion

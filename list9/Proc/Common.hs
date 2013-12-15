@@ -4,6 +4,7 @@ module Proc.Common
 , MemAssoc
 , Loc
 , assign
+, newVar
 , restore
 , lookUp
 , zipDomain) where
@@ -28,7 +29,13 @@ new :: Loc -> Loc
 new l = l + 1
 
 assign :: Ident -> Numeral -> Domain -> Domain
-assign v n (envV, (sto, next)) = (M.insert v next envV, (M.insert next n sto, new next))
+assign v n (envV, (sto, next)) = 
+    case M.lookup v envV of
+        Nothing -> error ("Undeclared variable `" ++ v ++ "'")
+        Just loc -> (envV, (M.insert loc n sto, next))
+
+newVar :: Ident -> Numeral -> Domain -> Domain
+newVar v n (envV, (sto, next)) = (M.insert v next envV, (M.insert next n sto, new next))
 
 lookUp :: Ident -> Domain -> Numeral
 lookUp v (envV, (sto, _)) = 
