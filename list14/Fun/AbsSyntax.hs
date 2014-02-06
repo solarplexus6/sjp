@@ -26,7 +26,12 @@ data Exp = N Numeral
          | App Exp Exp
          | Let Ident Exp Exp
          | Letrec Ident Ident Exp Exp
+         -- pair
          | Pair Exp Exp
          | Fst Exp
          | Snd Exp
+         -- alternative
+         | Inl Exp
+         | Inr Exp
+         | Case Exp Ident Exp Ident Exp
          deriving (Eq, Show)

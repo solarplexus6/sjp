@@ -18,7 +18,7 @@ library
   build-depends:       base ==4.6.*
                      , mtl >= 2.1
                      , containers >= 0.5
-  exposed-modules:     Fun.Strict.DenoSemantics
+  exposed-modules:     Fun.Eager.DenoSemantics
 
 --executable imp-sem 
 --  main-is:             ImpSemantics.hs

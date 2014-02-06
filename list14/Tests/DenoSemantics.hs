@@ -10,7 +10,7 @@ import qualified Data.Map as M (empty)
 import Tests.Common.Programs
 import Fun.AbsSyntax
 import Fun.Common
-import Fun.Strict.DenoSemantics
+import Fun.Eager.DenoSemantics
 
 runTest :: Exp -> V' -> Assertion
 runTest prog results = sem prog M.empty @?= results
@@ -27,5 +27,14 @@ testPairLambda = runTest pairAndLambda pairAndLambdaResult
 testSndTypeError :: Assertion
 testSndTypeError = runTest typeErrorSnd typeErrorSndResult
 
+testAlt :: Assertion
+testAlt = runTest alt altResult
+
 testFactorial :: Assertion
-testFactorial = sem factorialProg M.empty @?= factorialProgResult
+testFactorial = runTest factorialProg factorialProgResult
+
+testInfiniteRecPair :: Assertion
+testInfiniteRecPair = runTest infiniteRecPair infiniteRecPairResult
+
+testInfiniteRecIf :: Assertion
+testInfiniteRecIf = runTest infiniteRecIf infiniteRecIfResult

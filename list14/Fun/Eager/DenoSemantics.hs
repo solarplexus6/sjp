@@ -1,6 +1,6 @@
 {-# LANGUAGE ExistentialQuantification #-}
 
-module Fun.Strict.DenoSemantics
+module Fun.Eager.DenoSemantics
 ( sem
 )
 where
@@ -27,6 +27,10 @@ _pair :: (Vpair -> V') -> V -> V'
 _pair f (Vpair x) = f x
 _pair _ _         = TypeError
 
+_alt :: (Valt -> V') -> V -> V'
+_alt f (Valt x) = f x
+_alt _ _         = TypeError
+
 -- operator * z Reynoldsa (lift ogolny)
 infixl 2 ^*
 (^*) :: (V -> V') -> V' -> V'
@@ -34,7 +38,7 @@ f ^* (Vnorm z) = f z
 _ ^* Error = Error
 _ ^* TypeError = TypeError
 
--- doslownie jak w Reynolds, uzywajac sections przy liftowaniu, chyba nieczytelne
+-- doslownie jak w Reynolds, uzywajac sections przy liftowaniu, chyba słabo nieczytelne
 binOpA :: V' -> (Vint -> Vint -> Vint) -> V' -> V'
 binOpA a1 op a2 = (((\i1 -> (((\i2 -> Vnorm $ Vint (i1 `op` i2)) `_int`) ^*) a2) `_int`) ^*) a1
 
@@ -44,6 +48,7 @@ binOpB b1 op b2 = (((\r1 -> (((\r2 -> Vnorm $ Vbool (r1 `op` r2)) `_bool`) ^*) b
 binOpR :: V' -> (Vint -> Vint -> Vbool) -> V' -> V'
 binOpR a1 op a2 = (((\i1 -> (((\i2 -> Vnorm $ Vbool (i1 `op` i2)) `_int`) ^*) a2) `_int`) ^*) a1
 
+-- wyglada na to, ze 
 sem :: Exp -> Env -> V'
 sem (N n) _ = Vnorm $ Vint n
 sem (B b) _ = Vnorm $ Vbool b
@@ -51,6 +56,7 @@ sem (e1 :+: e2) env = binOpA (sem e1 env) (+) (sem e2 env)
 sem (e1 :-: e2) env = binOpA (sem e1 env) (-) (sem e2 env)
 sem (e1 :*: e2) env = binOpA (sem e1 env) (*) (sem e2 env)
 sem (e1 :&&: e2) env = binOpB (sem e1 env) (&&) (sem e2 env)
+sem (e1 :||: e2) env = binOpB (sem e1 env) (||) (sem e2 env)
 sem (e1 :<=: e2) env = binOpR (sem e1 env) (<=) (sem e2 env)
 sem (e1 :=: e2) env = binOpR (sem e1 env) (==) (sem e2 env)
 sem (Not e) env = (((\b -> Vnorm $ Vbool $ not b) `_bool`) ^*) $ sem e env
@@ -66,4 +72,11 @@ sem (Letrec ident lIdent e' e) env =
 sem (Pair e1 e2) env = ((\l -> ((\r -> Vnorm $ Vpair (l, r)) ^*) $ sem e2 env) ^*) $ sem e1 env
 sem (Fst e) env = (((\(l, _) -> Vnorm l) `_pair`) ^*) $ sem e env
 sem (Snd e) env = (((\(_, r) -> Vnorm r) `_pair`) ^*) $ sem e env
-sem _ _ = undefined
+sem (Inl e) env = ((\v -> Vnorm $ Valt $ Vinl v) ^*) $ sem e env
+sem (Inr e) env = ((\v -> Vnorm $ Valt $ Vinr v) ^*) $ sem e env
+sem (Case alt idl el idr er) env = 
+    (((\e -> case e of 
+        Vinl v -> sem el $ subst idl v env
+        Vinr v -> sem er $ subst idr v env
+    )`_alt`) ^*) $ sem alt env
+    

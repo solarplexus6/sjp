@@ -33,9 +33,30 @@ pairAndLambda = Fst (Pair (App (Lambda "x" (V "x" :<=: N 12 :&&: Not (N 12 :=: V
 pairAndLambdaResult :: V'
 pairAndLambdaResult = Vnorm $ Vbool True
 
+alt :: Exp
+alt = Let "fun" (Lambda "x" (Case (V "x") "vl" (N 2 :*: V "vl") "vr" (V "vr" :-: N 10)))
+        (Pair (App (V "fun") (Inl $ N 10 :+: N 5)) (App (V "fun") (Inr $ N 256 :-: N 100)))
+
+altResult :: V'
+altResult = Vnorm $ Vpair (Vint 30, Vint 146)
+
 factorialProg :: Exp
 factorialProg = Letrec "fact" "n" (If (V "n" :=: N 0) (N 1) (V "n" :*: (App (V "fact") (V "n" :-: N 1))))
                     (App (V "fact") (N 5))
 
 factorialProgResult :: V'
 factorialProgResult = Vnorm $ Vint 120
+
+infiniteRecPair :: Exp
+infiniteRecPair = Letrec "infinite" "n" (V "n" :+: (App (V "infinite") (V "n" :-: N 1)))
+                (Fst $ Pair (N 0) (App (V "infinite") (N 1000)))
+
+infiniteRecPairResult :: V'
+infiniteRecPairResult = Vnorm $ Vint 0
+
+infiniteRecIf :: Exp
+infiniteRecIf = Letrec "infinite" "n" (V "n" :+: (App (V "infinite") (V "n" :-: N 1)))
+                (If (B True) (N 1) (App (V "infinite") (N 1000)))
+
+infiniteRecIfResult :: V'
+infiniteRecIfResult = Vnorm $ Vint 1

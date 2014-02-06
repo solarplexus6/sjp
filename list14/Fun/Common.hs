@@ -5,6 +5,7 @@ module Fun.Common
 , Vbool
 , Vfun
 , Vpair
+, Valt (..)
 , Env
 , lookUp
 , subst
@@ -19,8 +20,9 @@ type Vint = Int
 type Vbool = Bool
 type Vfun = (V -> V')
 type Vpair = (V, V)
+data Valt = Vinl V | Vinr V deriving (Eq, Show)
 
-data V = Vint Vint | Vbool Vbool | Vfun Vfun | Vpair Vpair deriving Show
+data V = Vint Vint | Vbool Vbool | Vfun Vfun | Vpair Vpair | Valt Valt deriving Show
 
 instance Eq V where 
   Vfun _   == Vfun _   = True
@@ -33,6 +35,9 @@ instance Eq V where
   Vpair p1 == Vpair p2 = p1 == p2
   Vpair _  == _        = False
   _        == Vpair _  = False
+  Valt  a1 == Valt  a2 = a1 == a2
+  Valt  _  == _        = False
+  _        == Valt  _  = False
 
 data V' = Vnorm V | Error | TypeError deriving (Eq, Show)
 type Env = M.Map Ident V

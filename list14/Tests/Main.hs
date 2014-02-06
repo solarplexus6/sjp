@@ -36,7 +36,7 @@ mainWithOpts = do
 
 tests  :: [Test]
 tests = [
-    testGroup "Denotational semantics tests" [
+    testGroup "Eager variant tests" [
             testGroup "Arithmetic expressions" [
                 testCase "Base ops with let" Tests.DenoSemantics.testLet1
               ],
@@ -46,7 +46,14 @@ tests = [
             testGroup "Expressions" [
                 testCase "Snd type error with lambda" Tests.DenoSemantics.testSndTypeError
               , testCase "Pair, lambda, boolean operators" Tests.DenoSemantics.testPairLambda
+              , testCase "Alternative" Tests.DenoSemantics.testAlt
               , testCase "Factorial" Tests.DenoSemantics.testFactorial
-              ]
+              ],
+            testGroup "Eager evaluation" [
+              -- if jest leniwy ("short-circuit") nawet w jezykach gorliwych, wiec tak to tez zostawilem
+              testCase "If, infinite recursion" Tests.DenoSemantics.testInfiniteRecIf
+              -- ponizszy test poprawnie konczy sie przez stack overflow
+            --, testCase "Pair, Application, infinite recursion" Tests.DenoSemantics.testInfiniteRecPair
+            ]
           ]
     ]
