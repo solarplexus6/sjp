@@ -9,7 +9,7 @@ import Fun.Lazy.AbsSyntax
 import Fun.Common
 import Fun.Lazy.Domain
 
--- lift dla inta
+-- lifty dla poszczegolnych typow
 _int :: (Vint -> V') -> V -> V'
 _int f (Vint x) = f x
 _int _ _        = TypeError
@@ -61,11 +61,15 @@ sem (e1 :<=: e2) env = binOpR (sem e1 env) (<=) (sem e2 env)
 sem (e1 :=: e2) env = binOpR (sem e1 env) (==) (sem e2 env)
 sem (Not e) env = (((\b -> Vnorm $ Vbool $ not b) `_bool`) ^*) $ sem e env
 sem (If cond t e) env = (((\b -> if b then sem t env else sem e env) `_bool`) ^*) $ sem cond env
+--
+-- wszystko powyzej tak samo jak w Eager
+--
 sem (V ident) env = lookUp ident env
 sem (Lambda ident e) env = Vnorm $ Vfun (\a -> sem e $ subst ident a env)
 sem (App e e') env = (((\f -> f $ sem e' env) `_fun`) ^*) $ sem e env
 -- syntactic sugar
 sem (Let ident e' e) env = sem (App (Lambda ident e) e') env
+-- dowolne wyrazenie rekurencyjne
 sem (Rec e) env = (((\f -> fix f) `_fun`) ^*) $ sem e env
 -- syntactic sugar
 sem (Letrec ident e' e) env = sem (Let ident (Rec $ Lambda ident e') e) env

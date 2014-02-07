@@ -51,7 +51,7 @@ tests = [
               , testCase "Factorial" Eager.testFactorial
               ],
             testGroup "Eager evaluation" [
-              -- if jest leniwy ("short-circuit") nawet w jezykach gorliwych, wiec tak to tez zostawilem
+              -- if jest leniwy ("short-circuit") we wszystkich gorliwych jezykach funkcyjnych jakie znam, wiec tak to tez zostawilem
               testCase "If, infinite recursion" Eager.testInfiniteRecIf
               -- ponizszy test poprawnie konczy sie przez stack overflow
             --, testCase "Pair, Application, infinite recursion" Tests.DenoSemantics.testInfiniteRecPair
