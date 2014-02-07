@@ -1,7 +1,7 @@
-module Tests.Common.Programs where
+module Tests.Eager.Programs where
 
-import Fun.AbsSyntax
-import Fun.Common
+import Fun.Eager.AbsSyntax
+import Fun.Eager.Domain
 
 eqProg1 :: Exp
 eqProg1 = (N 10) :=: (N 12)

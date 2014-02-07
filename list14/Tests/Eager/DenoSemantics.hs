@@ -1,15 +1,15 @@
 {-# LANGUAGE ExistentialQuantification #-}
 
-module Tests.DenoSemantics where
+module Tests.Eager.DenoSemantics where
 
 import Test.HUnit hiding (State)
 -- import Test.QuickCheck
 
 import qualified Data.Map as M (empty)
 
-import Tests.Common.Programs
-import Fun.AbsSyntax
-import Fun.Common
+import Tests.Eager.Programs
+import Fun.Eager.AbsSyntax
+import Fun.Eager.Domain
 import Fun.Eager.DenoSemantics
 
 runTest :: Exp -> V' -> Assertion

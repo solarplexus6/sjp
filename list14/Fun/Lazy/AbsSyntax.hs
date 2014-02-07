@@ -1,4 +1,4 @@
-module Fun.AbsSyntax where
+module Fun.Lazy.AbsSyntax where
 
 type Numeral = Int
 type Ident = String
@@ -25,7 +25,10 @@ data Exp = N Numeral
          | Lambda Ident Exp
          | App Exp Exp
          | Let Ident Exp Exp
-         | Letrec Ident Ident Exp Exp
+         | Letrec Ident Exp Exp
+         | Rec Exp
+         | Unit
+         | Error
          -- pair
          | Pair Exp Exp
          | Fst Exp

@@ -8,7 +8,8 @@ import Test.Framework.Runners.Options (RunnerOptions, RunnerOptions'(..))
 import Test.Framework.Providers.HUnit
 --import Test.Framework.Providers.QuickCheck2 (testProperty)
 
-import Tests.DenoSemantics
+import Tests.Eager.DenoSemantics as Eager
+import Tests.Lazy.DenoSemantics as Lazy
 
 main :: IO ()
 main = defaultMain tests
@@ -38,22 +39,41 @@ tests  :: [Test]
 tests = [
     testGroup "Eager variant tests" [
             testGroup "Arithmetic expressions" [
-                testCase "Base ops with let" Tests.DenoSemantics.testLet1
+                testCase "Base ops with let" Eager.testLet1
               ],
             testGroup "Boolean expressions" [
-                testCase "Equality, literals, not equal" Tests.DenoSemantics.testEq1
+                testCase "Equality, literals, not equal" Eager.testEq1
               ],
             testGroup "Expressions" [
-                testCase "Snd type error with lambda" Tests.DenoSemantics.testSndTypeError
-              , testCase "Pair, lambda, boolean operators" Tests.DenoSemantics.testPairLambda
-              , testCase "Alternative" Tests.DenoSemantics.testAlt
-              , testCase "Factorial" Tests.DenoSemantics.testFactorial
+                testCase "Snd type error with lambda" Eager.testSndTypeError
+              , testCase "Pair, lambda, boolean operators" Eager.testPairLambda
+              , testCase "Alternative" Eager.testAlt
+              , testCase "Factorial" Eager.testFactorial
               ],
             testGroup "Eager evaluation" [
               -- if jest leniwy ("short-circuit") nawet w jezykach gorliwych, wiec tak to tez zostawilem
-              testCase "If, infinite recursion" Tests.DenoSemantics.testInfiniteRecIf
+              testCase "If, infinite recursion" Eager.testInfiniteRecIf
               -- ponizszy test poprawnie konczy sie przez stack overflow
             --, testCase "Pair, Application, infinite recursion" Tests.DenoSemantics.testInfiniteRecPair
+            ]
+          ],
+    testGroup "Lazy variant tests" [
+            testGroup "Arithmetic expressions" [
+                testCase "Base ops with let" Lazy.testLet1
+              ],
+            testGroup "Boolean expressions" [
+                testCase "Equality, literals, not equal" Lazy.testEq1
+              ],
+            testGroup "Expressions" [
+                testCase "Snd type error with lambda" Lazy.testSndTypeError
+              , testCase "Pair, lambda, boolean operators" Lazy.testPairLambda
+              , testCase "Alternative" Lazy.testAlt
+              , testCase "Factorial" Lazy.testFactorial
+              ],
+            testGroup "Lazy evaluation" [
+              testCase "If, infinite recursion" Lazy.testInfiniteRecIf
+            , testCase "Pair, Application, infinite recursion" Lazy.testInfiniteRecPair
+            , testCase "Infinite list" Lazy.testInfiniteList
             ]
           ]
     ]
