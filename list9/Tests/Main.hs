@@ -62,6 +62,10 @@ tests = [
               ],
             testGroup "Recursive procedures" [
                   testCase "Factorial" Tests.DenoSemantics.testFactorialProc
+              ],
+            testGroup "Procedure argument" [
+                  testCase "Nonrecursive" Tests.DenoSemantics.testProcArgNonRecursive
+                , testCase "Recursive" Tests.DenoSemantics.testProcArgRecursive
               ]
           ]
     ]

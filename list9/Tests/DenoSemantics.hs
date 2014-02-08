@@ -100,3 +100,9 @@ testStaticScope2 = testComm staticScope2 staticScope2Result
 
 testFactorialProc :: Assertion
 testFactorialProc = testComm factorialProc factorialProcResult
+
+testProcArgNonRecursive :: Assertion
+testProcArgNonRecursive = testComm procArgNonRecursive procArgNonRecursiveResult
+
+testProcArgRecursive :: Assertion
+testProcArgRecursive = testComm procArgRecursive procArgRecursiveResult

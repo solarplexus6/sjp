@@ -26,7 +26,7 @@ type Loc    = Int
 type Memory = M.Map Loc Numeral
 type Store  = (Memory, Loc)
 type EnvV   = M.Map Ident Loc
-data EnvP   = EnvP (M.Map Ident (EnvV, EnvP, Sigma Omega))
+data EnvP   = EnvP (M.Map Ident (EnvV, EnvP, Ident, Sigma Omega))
 data Domain = D (EnvV, EnvP, Store)
 
 type Sigma a = State Domain a
@@ -48,7 +48,7 @@ newVar v n (D (envV, envP, (sto, next))) = D (M.insert v next envV, envP, (M.ins
 lookUp :: Ident -> Domain -> Numeral
 lookUp v (D (envV, _, (sto, _))) = 
     case M.lookup v envV of
-        Nothing  -> error ("Unbound variable `" ++ v ++ "'")
+        Nothing  -> error ("Unbound variable `" ++ v ++ "'" ++ (show envV))
         Just loc -> case M.lookup loc sto of
             Nothing -> error ("Corrupted store")
             Just n  -> n
@@ -59,10 +59,10 @@ restore = M.union
 zipDomain :: Domain -> MemState
 zipDomain (D (envV, _, (sto, _) )) = M.fromList $ M.elems $ M.intersectionWith (\v n -> (v, n)) (M.fromList $ map (\(k,v) -> (v,k)) $ M.assocs envV) sto
 
-newProc :: Ident -> Sigma Omega -> Domain -> Domain
-newProc p pc (D (envV, EnvP envP, sto)) = D (envV, EnvP $ M.insert p (envV, EnvP envP, pc) envP, sto)
+newProc :: Ident -> Ident -> Sigma Omega -> Domain -> Domain
+newProc p arg pc (D (envV, EnvP envP, sto)) = D (envV, EnvP $ M.insert p (envV, EnvP envP, arg, pc) envP, sto)
 
-lookUpProc :: Ident -> EnvP -> (EnvV, EnvP, Sigma Omega)
+lookUpProc :: Ident -> EnvP -> (EnvV, EnvP, Ident, Sigma Omega)
 lookUpProc p (EnvP envP) = 
     case M.lookup p envP of
         Nothing  -> error ("Unbound procedure `" ++ p ++ "'")

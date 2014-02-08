@@ -52,9 +52,9 @@ staticScope1 :: Com
 staticScope1 = 
     Begin ( Var "x" (N 7) :~: 
             Var "y" (N 10) :~:
-            Proc "p" ("x" := N 0)) $
+            Proc "p" "()" ("x" := N 0)) $
         (
-            Begin (Var "x" (N 5)) (Call "p") :.:
+            Begin (Var "x" (N 5)) (Call "p" (N 0)) :.:
             "y" := V "x"
         )
 
@@ -65,40 +65,58 @@ staticScope2 :: Com
 staticScope2 =
     Begin (
         Var "x" (N 0) :~: 
-        Proc "p" ("x" := (V "x" :+: N 1)) :~:
-        Proc "q" (Call "p"))
+        Proc "p" "()" ("x" := (V "x" :+: N 1)) :~:
+        Proc "q" "()" (Call "p" (N 0)))
     (
-        Begin (Proc "p" ("x" := N 7))
-            (Call "q")
+        Begin (Proc "p" "()" ("x" := N 7))
+            (Call "q" (N 0))
     )
 
 staticScope2Result :: MemAssoc
 staticScope2Result = [("x", 1)]
 
+-- wersja dla procedur bez argumentow
 factorialProc :: Com
 factorialProc =
     Begin (
         Var "x" (N 5) :~:
         Var "y" (N 1) :~:
-        Proc "fac" 
+        Proc "fac" "()"
             (Begin (Var "z" (V "x"))
                 (If (V "x" :=: N 1)
                     Skip
-                    ("x" := V "x" :-: N 1 :.: Call "fac" :.: "y" := V "z" :*: V "y"))
+                    ("x" := V "x" :-: N 1 :.: Call "fac" (N 0) :.: "y" := V "z" :*: V "y"))
             )
         )
-        (Call "fac")
---factorialProc =
---    Begin (
---        Var "x" (N 2) :~:
---        Var "y" (N 1) :~:
---        Proc "fac" 
---            (If (V "x" :=: N 1)
---                    Skip
---                    (("x" := V "x" :-: N 1) :.: Call "fac")
---            )
---        )
---        (Call "fac")
+        (Call "fac" (N 0))
 
 factorialProcResult :: MemAssoc
 factorialProcResult = [("x", 1), ("y", 120)]
+
+procArgNonRecursive :: Com
+procArgNonRecursive = 
+    Begin (
+        Var "y" (N 0) :~:
+        Proc "test" "x"
+            (If (V "x" :=: N 3)
+                ("y" := V "x" :*: N 2)
+                Skip)
+        )
+        (Call "test" (N 1 :+: N 2))
+
+procArgNonRecursiveResult :: MemAssoc
+procArgNonRecursiveResult = [("y", 6)]
+
+procArgRecursive :: Com
+procArgRecursive = 
+    Begin (
+        Var "y" (N 0) :~:
+        Proc "test" "x"
+            (If (V "x" :=: N 0)
+                Skip
+                ("y" := V "y" :+: N 2 :.: Call "test" (V "x" :-: N 1)))
+        )
+        (Call "test" (N 10))
+
+procArgRecursiveResult :: MemAssoc
+procArgRecursiveResult = [("y", 20)]

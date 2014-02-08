@@ -33,11 +33,11 @@ data Com = Ident := Aexp                  -- assignment
          | If Bexp Com Com              -- if then else
          | While Bexp Com               -- while
          | Begin Dec Com                -- blocks
-         | Call Ident
+         | Call Ident Aexp
          deriving (Eq, Show)
 
 data Dec = Empty 
          | Var Ident Aexp 
-         | Proc Ident Com
+         | Proc Ident Ident Com
          | Dec :~: Dec
          deriving (Eq, Show)

@@ -68,10 +68,11 @@ comm c = case c of
     -- ze wzgledu na uzycie State Monad i przyjetego w zwiazku z tym modelu
     -- Call sie komplikuje w stosunku do oryginalnej definicji z NN07, ale 
     -- za to cala reszta implementacji prawie sie nie zmienia
-    Call p     -> do
+    Call p a   -> do                    
                     D (envV, envP, sto) <- get -- pierwotne srodowisko
-                    let (pEnvV, pEnvP, runProc) = lookUpProc p envP -- wyciagamy envV, envP dla procedury oraz monade runProc reprezentujaca wykonanie p
-                    put $ D (pEnvV, pEnvP, sto)
+                    let (pEnvV, pEnvP, arg, runProc) = lookUpProc p envP -- wyciagamy envV, envP, nazwe argumentu dla procedury oraz monade runProc reprezentujaca wykonanie p
+                    ar <- aexp a
+                    put $ newVar arg ar $ D (pEnvV, pEnvP, sto)
                     runProc
                     D (_, _, newS) <- get
                     put $ D (envV, envP, newS)
@@ -86,11 +87,11 @@ decl d = case d of
     --
     d1 :~: d2 -> decl d1 >> decl d2
     --
-    Proc p c -> do
-        dom@(D (envV, envP, _)) <- get        
+    Proc p x c -> do
+        dom@(D (_, envP, _)) <- get
         let gamma g = do 
-            D (_, _, sto) <- get -- wyciagamy obecne sto
-            put (newProc p g $ D (envV, envP, sto)) -- update envP, ale tak zeby nie zepsuc sto
+            D (envV', _, sto) <- get -- wyciagamy obecne sto
+            put $ newProc p x g $ D (envV', envP, sto) -- update envP, ale tak zeby nie zepsuc sto
             comm c -- wykonanie wywolania rek.
-        put (newProc p (fix gamma) dom)
+        put (newProc p x (fix gamma) dom)
 
