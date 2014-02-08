@@ -5,17 +5,14 @@ module Proc.DenoSemantics
 , bexp
 , aexp
 , decl
-, Omega (..)
 )
 where
 
-import Control.Monad.State
+import Control.Monad.State (get, put)
+import Data.Function (fix)
 
 import Proc.Common
 import Proc.AbsSyntax
-
-data Omega = IotaTerm Domain
-           deriving (Eq, Show)
 
 liftBin :: Monad m => (t -> m t1) -> (t1 -> t1 -> b) -> t -> t -> m b
 liftBin semFun f expr1 expr2 = do
@@ -47,20 +44,20 @@ bexp expr = case expr of
     b1 :&&: b2 -> computeB b1 (&&) b2
     b1 :||: b2 -> computeB b1 (||) b2
 
-comm :: Com -> (Sigma Omega)
+comm :: Com -> Sigma Omega
 comm c = case c of
     v := a     -> do
-                    s  <- get
+                    d  <- get
                     ar <- aexp a
-                    newS <- return $ assign v ar s
-                    put $ newS
-                    return $ IotaTerm newS
+                    newD <- return $ assign v ar d
+                    put $ newD
+                    return $ IotaTerm newD
     Skip       -> get >>= (return . IotaTerm)
     c1 :.: c2  -> do
-                    (envV, _) <- get -- wyciagamy pierwotne srodowisko
+                    D (envV, envP, _) <- get -- wyciagamy pierwotne srodowisko
                     comm c1          -- wywolujemy c1
-                    (_, newS) <- get -- olewamy zmienione srodowisko, wyciagamy nowy store
-                    put (envV, newS) -- przywracamy stare srodowisko
+                    D (_, _, newS) <- get -- olewamy zmienione srodowisko, wyciagamy nowy store
+                    put $ D (envV, envP, newS) -- przywracamy stare srodowisko
                     comm c2          -- wywolujemy c2
                     
     If b c1 c2 -> bexp b >>= \br -> if br then comm c1 else comm c2    
@@ -68,13 +65,32 @@ comm c = case c of
                       gamma f = bexp b >>= \br -> if br then (comm c') >> f else comm Skip
     --Begin d c' -> decl d >> comm c' >> get >>= (return . IotaTerm)
     Begin d c' -> decl d >> comm c'
-    _          -> undefined
+    -- ze wzgledu na uzycie State Monad i przyjetego w zwiazku z tym modelu
+    -- Call sie komplikuje w stosunku do oryginalnej definicji z NN07, ale 
+    -- za to cala reszta implementacji prawie sie nie zmienia
+    Call p     -> do
+                    D (envV, envP, sto) <- get -- pierwotne srodowisko
+                    let (pEnvV, pEnvP, runProc) = lookUpProc p envP -- wyciagamy envV, envP dla procedury oraz monade runProc reprezentujaca wykonanie p
+                    put $ D (pEnvV, pEnvP, sto)
+                    runProc
+                    D (_, _, newS) <- get
+                    put $ D (envV, envP, newS)
+                    get >>= (return . IotaTerm)
 
 decl :: Dec -> (Sigma ())
 decl d = case d of
     Var v a -> do
-        n <- aexp a
-        s <- get
-        put (newVar v n s)
-    d1 :~: d2 -> decl d1 >> decl d2        
-    _ -> undefined
+        n   <- aexp a
+        dom <- get
+        put (newVar v n dom)
+    --
+    d1 :~: d2 -> decl d1 >> decl d2
+    --
+    Proc p c -> do
+        dom@(D (envV, envP, _)) <- get        
+        let gamma g = do 
+            D (_, _, sto) <- get -- wyciagamy obecne sto
+            put (newProc p g $ D (envV, envP, sto)) -- update envP, ale tak zeby nie zepsuc sto
+            comm c -- wykonanie wywolania rek.
+        put (newProc p (fix gamma) dom)
+

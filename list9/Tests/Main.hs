@@ -50,11 +50,18 @@ tests = [
                 , testCase "While" Tests.DenoSemantics.testWhile
                 , testCase "Factorial" Tests.DenoSemantics.testFactorial                
               ],
-            testGroup "Declarations" [
+            testGroup "Variables declarations" [
                   testCase "Simple variable declaration" Tests.DenoSemantics.testSimpleVarDecl,
                   testCase "Multiple variables declaration" Tests.DenoSemantics.testMultipleVarDecl,
                   testCase "Overwrite global var with local" Tests.DenoSemantics.testDeclOverwrite,
                   testCase "Restoring var value after exiting block" Tests.DenoSemantics.testDeclRestore
+              ],
+            testGroup "Static scope" [
+                  testCase "NN07 page 132" Tests.DenoSemantics.testStaticScope1
+                , testCase "NN07 Ex 6.6" Tests.DenoSemantics.testStaticScope2
+              ],
+            testGroup "Recursive procedures" [
+                  testCase "Factorial" Tests.DenoSemantics.testFactorialProc
               ]
           ]
     ]

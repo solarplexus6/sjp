@@ -47,3 +47,58 @@ declRestoreProgram = Begin (Var "y" (N 0) :~:
 
 declRestoreProgramResult :: MemAssoc
 declRestoreProgramResult = [("x", 1), ("y", 1)]
+
+staticScope1 :: Com
+staticScope1 = 
+    Begin ( Var "x" (N 7) :~: 
+            Var "y" (N 10) :~:
+            Proc "p" ("x" := N 0)) $
+        (
+            Begin (Var "x" (N 5)) (Call "p") :.:
+            "y" := V "x"
+        )
+
+staticScope1Result :: MemAssoc
+staticScope1Result = [("x", 0), ("y", 0)]
+
+staticScope2 :: Com
+staticScope2 =
+    Begin (
+        Var "x" (N 0) :~: 
+        Proc "p" ("x" := (V "x" :+: N 1)) :~:
+        Proc "q" (Call "p"))
+    (
+        Begin (Proc "p" ("x" := N 7))
+            (Call "q")
+    )
+
+staticScope2Result :: MemAssoc
+staticScope2Result = [("x", 1)]
+
+factorialProc :: Com
+factorialProc =
+    Begin (
+        Var "x" (N 5) :~:
+        Var "y" (N 1) :~:
+        Proc "fac" 
+            (Begin (Var "z" (V "x"))
+                (If (V "x" :=: N 1)
+                    Skip
+                    ("x" := V "x" :-: N 1 :.: Call "fac" :.: "y" := V "z" :*: V "y"))
+            )
+        )
+        (Call "fac")
+--factorialProc =
+--    Begin (
+--        Var "x" (N 2) :~:
+--        Var "y" (N 1) :~:
+--        Proc "fac" 
+--            (If (V "x" :=: N 1)
+--                    Skip
+--                    (("x" := V "x" :-: N 1) :.: Call "fac")
+--            )
+--        )
+--        (Call "fac")
+
+factorialProcResult :: MemAssoc
+factorialProcResult = [("x", 1), ("y", 120)]

@@ -8,16 +8,16 @@ import Test.QuickCheck
 import qualified Data.Map as M (empty, fromList, findMax)
 import Control.Monad.State (runState)
 
-import Proc.Common (zipDomain, MemAssoc)
+import Proc.Common (zipDomain, MemAssoc, Domain (..), Omega (..), EnvP (..))
 import Proc.AbsSyntax
 import Proc.DenoSemantics
 import Tests.Programs
 
 runTest semFun expr (envV, sto) = 
     let initS = case sto of
-                    [] -> (M.empty, (M.empty, 0))
+                    [] -> D (M.empty, EnvP M.empty, (M.empty, 0))
                     _  -> let stoMap = M.fromList sto in 
-                        (M.fromList envV, (stoMap, (fst $ M.findMax stoMap) + 1))
+                        D (M.fromList envV, EnvP M.empty, (stoMap, (fst $ M.findMax stoMap) + 1))
     in
         runState (semFun expr) initS
 
@@ -91,3 +91,12 @@ testDeclOverwrite = testComm (Begin (Var "x" (N 5) :~: Var "y" (N 0) :~: Var "z"
 -- Nielsons Exercise 6.4
 testDeclRestore :: Assertion
 testDeclRestore = testComm declRestoreProgram declRestoreProgramResult
+
+testStaticScope1 :: Assertion
+testStaticScope1 = testComm staticScope1 staticScope1Result
+
+testStaticScope2 :: Assertion
+testStaticScope2 = testComm staticScope2 staticScope2Result
+
+testFactorialProc :: Assertion
+testFactorialProc = testComm factorialProc factorialProcResult
