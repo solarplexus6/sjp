@@ -69,3 +69,9 @@ infiniteRecLetApp = Letrec "infinite" "n" (V "n" :+: (App (V "infinite") (V "n" 
 infiniteRecLetAppResult :: V'
 infiniteRecLetAppResult = undefined
 
+fixConst :: Exp
+fixConst = Letrec "f" "x" (App (V "f") (V "x"))
+            (App (Lambda "y" (N 42)) (App (V "f") (N 69)))
+
+fixConstResult :: V'
+fixConstResult = undefined

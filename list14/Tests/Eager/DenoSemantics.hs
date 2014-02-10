@@ -41,3 +41,6 @@ testInfiniteRecIf = runTest infiniteRecIf infiniteRecIfResult
 
 testInfiniteRecLetApp :: Assertion
 testInfiniteRecLetApp = runTest infiniteRecLetApp infiniteRecLetAppResult
+
+testFixConst :: Assertion
+testFixConst = runTest fixConst fixConstResult

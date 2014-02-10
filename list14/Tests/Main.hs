@@ -57,6 +57,7 @@ tests = [
             --, testCase "Pair, Application, infinite recursion" Eager.testInfiniteRecPair
             -- tutaj rowniez wszystko dzieje sie gorliwie i zapetla sie
             --, testCase "Application, let, infinite recursion" Eager.testInfiniteRecLetApp
+            --, testCase "Fix, Application, constant function" Eager.testFixConst
             ]
           ],
     testGroup "Lazy variant tests" [
