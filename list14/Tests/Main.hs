@@ -54,7 +54,9 @@ tests = [
               -- if jest leniwy ("short-circuit") we wszystkich gorliwych jezykach funkcyjnych jakie znam, wiec tak to tez zostawilem
               testCase "If, infinite recursion" Eager.testInfiniteRecIf
               -- ponizszy test poprawnie konczy sie przez stack overflow
-            --, testCase "Pair, Application, infinite recursion" Tests.DenoSemantics.testInfiniteRecPair
+            --, testCase "Pair, Application, infinite recursion" Eager.testInfiniteRecPair
+            -- tutaj rowniez wszystko dzieje sie gorliwie i zapetla sie
+            --, testCase "Application, let, infinite recursion" Eager.testInfiniteRecLetApp
             ]
           ],
     testGroup "Lazy variant tests" [

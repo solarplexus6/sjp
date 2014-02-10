@@ -38,3 +38,6 @@ testInfiniteRecPair = runTest infiniteRecPair infiniteRecPairResult
 
 testInfiniteRecIf :: Assertion
 testInfiniteRecIf = runTest infiniteRecIf infiniteRecIfResult
+
+testInfiniteRecLetApp :: Assertion
+testInfiniteRecLetApp = runTest infiniteRecLetApp infiniteRecLetAppResult

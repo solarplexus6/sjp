@@ -52,7 +52,7 @@ infiniteRecPair = Letrec "infinite" "n" (V "n" :+: (App (V "infinite") (V "n" :-
                 (Fst $ Pair (N 0) (App (V "infinite") (N 1000)))
 
 infiniteRecPairResult :: V'
-infiniteRecPairResult = Vnorm $ Vint 0
+infiniteRecPairResult = undefined
 
 infiniteRecIf :: Exp
 infiniteRecIf = Letrec "infinite" "n" (V "n" :+: (App (V "infinite") (V "n" :-: N 1)))
@@ -60,3 +60,12 @@ infiniteRecIf = Letrec "infinite" "n" (V "n" :+: (App (V "infinite") (V "n" :-: 
 
 infiniteRecIfResult :: V'
 infiniteRecIfResult = Vnorm $ Vint 1
+
+infiniteRecLetApp :: Exp
+infiniteRecLetApp = Letrec "infinite" "n" (V "n" :+: (App (V "infinite") (V "n" :-: N 1)))
+                (Let "infResult" (App (V "infinite") (N 1000))
+                    (N 10))
+
+infiniteRecLetAppResult :: V'
+infiniteRecLetAppResult = undefined
+
